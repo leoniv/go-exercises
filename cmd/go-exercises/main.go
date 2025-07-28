@@ -6,7 +6,5 @@ import (
 )
 
 func main() {
-	var k int
-	fmt.Scan(&k)
-	fmt.Println(algorithms.Selection([]int{2, 36, 5, 21, 8, 13, 11, 20, 5, 4, 1}, k))
+	fmt.Println(algorithms.RadixSort([]uint32{329, 457, 657, 839, 436, 720, 355}))
 }
