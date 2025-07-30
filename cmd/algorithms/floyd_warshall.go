@@ -4,6 +4,7 @@ type Tuple3 struct {
 	P_1, P_2, P_3 int
 }
 
+// It finds shortest paths between all pairs of vertexes in weighted graph
 func FloydWarshal(edges [][3]int) map[Tuple3]int {
 	dist := make(map[Tuple3]int)
 	n := len(edges)

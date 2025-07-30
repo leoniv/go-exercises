@@ -5,6 +5,8 @@ import (
 	"math"
 )
 
+// It finds minimal amount of matrix multiplications
+// A X (B X C) not the same (A X B) X C
 func MatrixMinMult(matrixs [][2]int) int {
 	result := make([][]int, len(matrixs))
 	for i := range result {

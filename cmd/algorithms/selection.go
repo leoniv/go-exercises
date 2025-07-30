@@ -2,6 +2,7 @@ package algorithms
 
 import "fmt"
 
+// It finds k-th item in unsorted in
 func Selection(in []int, k int) int {
 	fmt.Println("in: ", in, "k: ", k)
 	sl, sv, sr := split(in, k)
