@@ -1,7 +1,9 @@
 package main
 
-import "local/go-exercises/channels"
+import (
+	lesson2 "local/go-exercises/concurrency/lesson-2"
+)
 
 func main() {
-	channels.Run()
+	lesson2.Run()
 }

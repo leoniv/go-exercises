@@ -13,6 +13,7 @@ func Run() {
 }
 
 func lookIntoPointers() {
+	return
 	var ip *int
 	var ipp **int = &ip
 	fmt.Println("Look into pointers (var ip *int)", "pointer var address:", ipp, "pointer:", ip, "pointed value:", "")
@@ -33,6 +34,7 @@ func lookIntoPointers() {
 }
 
 func lookToMap() {
+	return
 	map_ := make(map[int]int)
 
 	fmt.Println("Look to map (new map):", unsafe.Pointer(&map_), map_)
@@ -46,13 +48,15 @@ func lookToMapDownStream(in map[int]int) {
 }
 
 func lookToSlice() {
-	var slice []int
+	slice := []int{42}
 	fmt.Println("Look to slice (new slice):", unsafe.Pointer(&slice), cap(slice), slice)
-	lookToSliceDownStream(slice)
+	lookToSliceDownStream(slice, 0)
 	fmt.Println("Look to slice (down stream return):", unsafe.Pointer(&slice), cap(slice), slice)
 }
 
-func lookToSliceDownStream(in []int) {
+func lookToSliceDownStream(in []int, i int) {
+	in[i] += 1
 	in = append(in, 10)
+	in[i] = 124
 	fmt.Println("Look to slice (down stream):", unsafe.Pointer(&in), cap(in), in)
 }
