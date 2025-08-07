@@ -15,16 +15,48 @@ func Run() {
 	onExit := func() { fmt.Println("Program exit by: ", ctx.Err()) }
 	defer onExit()
 
-	chan1 := make(chan int, 1000)
-	chan2 := make(chan int, 1000)
-	go producer(ctx, chan1, 1)
-	go producer(ctx, chan2, 2)
+	pipe := fmap(join(
+		producer(ctx, 1),
+		producer(ctx, 2),
+		producer(ctx, 3),
+	),
+		func(i int) string {
+			return fmt.Sprintf("Resive:", i)
+		},
+	)
 
-	out := join(chan1, chan2)
+	result := fold(pipe, "", func(a, b string) string {
+		return a + ", " + b
+	})
 
-	for msg := range out {
-		fmt.Println("Resive: ", msg)
+	fmt.Println(result)
+}
+
+func fold[A, B any](in <-chan A, zero B, f func(A, B) B) B {
+	result := zero
+	drain(in, func(a A) {
+		result = f(a, result)
+	})
+	return result
+}
+
+func drain[A any](in <-chan A, f func(A)) {
+	for a := range in {
+		f(a)
 	}
+}
+
+func fmap[A, B any](in <-chan A, f func(A) B) <-chan B {
+	result := make(chan B)
+
+	go func() {
+		defer close(result)
+		for a := range in {
+			result <- f(a)
+		}
+	}()
+
+	return result
 }
 
 func join[T any](chans ...<-chan T) <-chan T {
@@ -51,19 +83,23 @@ func join[T any](chans ...<-chan T) <-chan T {
 	return out
 }
 
-func producer(ctx context.Context, ch chan<- int, id int) {
-	defer fmt.Println("Producer interrupted")
-	defer close(ch)
+func producer(ctx context.Context, id int) <-chan int {
+	ch := make(chan int)
 
-	ticker := time.NewTicker(time.Duration(id) * time.Second)
-	defer ticker.Stop()
+	go func() {
+		defer close(ch)
+		ticker := time.NewTicker(time.Duration(id) * time.Second)
+		defer ticker.Stop()
 
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-			ch <- id
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				ch <- id
+			}
 		}
-	}
+	}()
+
+	return ch
 }
